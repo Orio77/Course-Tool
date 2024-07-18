@@ -19,6 +19,7 @@ async function sendRequestWithRetry(temperature: number, model: string, systemPr
           { role: "system", content: systemPrompt },
           { role: "user", content: userPrompt }
         ],
+        response_format: { "type": "json_object" },
       });
       console.log('Response:', response);
       return response;

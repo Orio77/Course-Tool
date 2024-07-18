@@ -36,14 +36,29 @@ export async function POST(req: Request, res: Response) {
             )
         })
 
-        let output_units: outputUnits = await strict_output(
-            'Act as a master course creator. Create course content. Create chapter titles. Find most suited youtube videos',
-           user_prompts,
-        {
+        let result: outputUnits = [];
+        let output_format = {
             title: 'title of the unit',
             chapters: 'an array of chapters, each chapter should have a youtube_search_query and a chapter_title key in the JSON object' 
+        };
+        let system_prompt = 'Act as a master course creator. Create course content. Create chapter titles. Find most suited youtube videos';
+
+        for (const prompt in user_prompts) {
+            result.push(await strict_output(
+                system_prompt,
+                prompt,
+                output_format)
+            )
         }
-        );
+
+        // let output_units: outputUnits = await strict_output(
+        //     'Act as a master course creator. Create course content. Create chapter titles. Find most suited youtube videos',
+        //    user_prompts,
+        // {
+        //     title: 'title of the unit',
+        //     chapters: 'an array of chapters, each chapter should have a youtube_search_query and a chapter_title key in the JSON object' 
+        // }
+        // );
 
         const imageSearchTerm = await strict_output(
             'Act as a image search master',
@@ -62,7 +77,7 @@ export async function POST(req: Request, res: Response) {
             },
         });
 
-        for (const unit of output_units) {
+        for (const unit of result) {
             const title = unit.title;
             const prismaUnit = await prisma.unit.create({
                 data: {

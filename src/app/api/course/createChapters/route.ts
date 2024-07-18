@@ -28,7 +28,7 @@ export async function POST(req: Request, res: Response) {
             }[];
         }[];
 
-        let user_prompts: string | string[] = [];
+        let user_prompts: string[] = [];
 
         units.forEach(unit => {
             user_prompts.push(
@@ -37,18 +37,18 @@ export async function POST(req: Request, res: Response) {
         })
 
         let result: outputUnits = [];
-        let output_format = {
-            title: 'title of the unit',
-            chapters: 'an array of chapters, each chapter should have a youtube_search_query and a chapter_title key in the JSON object' 
-        };
         let system_prompt = 'Act as a master course creator. Create course content. Create chapter titles. Find most suited youtube videos';
 
         for (const prompt in user_prompts) {
-            result.push(await strict_output(
+            let output = await strict_output(
                 system_prompt,
                 prompt,
-                output_format)
-            )
+                {
+                    title: 'title of the unit',
+                    chapters: 'an array of chapters, each chapter should have a youtube_search_query and a chapter_title key in the JSON object' 
+                })
+            
+            result.push(output);
         }
 
         // let output_units: outputUnits = await strict_output(

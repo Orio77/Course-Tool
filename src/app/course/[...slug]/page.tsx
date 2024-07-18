@@ -70,7 +70,7 @@ const CoursePage = async ({params: {slug}}: Props) => {
                             </Link>
                         )}
 
-                        {prevChapter && (
+                        {nextChapter && (
                             <Link href={`/course/${course.id}/${unitIndex}/${chapterIndex + 1}`} className='flex mt-4 ml-auto w-fit'>
                                 <div className='flex items-center'>
                                     <div className='flex flex-col items-start'>

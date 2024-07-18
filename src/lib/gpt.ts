@@ -83,23 +83,6 @@ export async function strict_output(
     const userPrompt = user_prompt.toString();
 
     const response = await sendRequestWithRetry(temperature, model, systemPrompt, userPrompt);
-    
-
-    // Use OpenAI to get a response
-    // const response = await openai.createChatCompletion({
-    //   temperature: temperature,
-    //   model: model,
-    //   messages: [
-    //     {
-    //       role: "system",
-    //       content: system_prompt + output_format_prompt + error_msg,
-    //     },
-    //     { role: "user", content: user_prompt.toString() },
-    //   ],
-    // });
-
-    // let res: string =
-    //   response.data.choices[0].message?.content?.replace(/'/g, '"') ?? "";
 
     let res: string = response.choices[0]?.message?.content?.replace(/'/g, '"') ?? "";
 

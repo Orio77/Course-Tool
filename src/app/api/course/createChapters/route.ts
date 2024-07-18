@@ -4,7 +4,6 @@ import { strict_output } from "@/lib/gpt";
 import { checkSubscription } from "@/lib/subscription";
 import { getUnsplashImage } from "@/lib/unsplash";
 import { createChaptersSchema } from "@/validators/course";
-import { Prisma } from "@prisma/client";
 import { NextResponse } from "next/server";
 import { ZodError } from "zod";
 
@@ -31,10 +30,10 @@ export async function POST(req: Request, res: Response) {
 
         let output_units: outputUnits = await strict_output(
             'Act as a master course creator. Create course content. Create chapter titles. Find most suited youtube videos',
-            new Array(units.length).fill(`Create a course about ${title}. The user has requested to create chapters for each of the units. Then for each chapter provide a detailed youtube search query to find an informative educational video. Each query should give educational informative course in youtube.`),
+            new Array(units.length).fill(`Create a course about ${title}. The user has requested to create chapters for each of the units: ${units}. Then for each chapter provide a detailed youtube search query to find an informative educational video. Each query should give educational informative course in youtube.`),
         {
             title: 'title of the unit',
-            chapters: 'an array of chapters, each chapter should have a youtube search query and a chapter_title key in the JSON object' 
+            chapters: 'an array of chapters, each chapter should have a youtube_search_query and a chapter_title key in the JSON object' 
         }
         );
 
@@ -56,10 +55,10 @@ export async function POST(req: Request, res: Response) {
         });
 
         for (const unit of output_units) {
-            const unitTitle = unit.title;
+            const title = unit.title;
             const prismaUnit = await prisma.unit.create({
                 data: {
-                    name: unitTitle,
+                    name: title,
                     courseId: course.id
                 }
             })

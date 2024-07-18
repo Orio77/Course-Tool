@@ -12,8 +12,6 @@ export async function POST(req: Request, res: Response) {
     try {
         const body = await req.json();
         const { chapterId } = bodyParser.parse(body);
-        console.log("Received chapterId:", chapterId);
-
         const chapter = await prisma.chapter.findUnique({
             where: {
                 id: chapterId,
@@ -21,7 +19,6 @@ export async function POST(req: Request, res: Response) {
         });
 
         if (!chapter) {
-            console.error("Chapter not found:", chapterId);
             return NextResponse.json({
                 success: false,
                 error: "Chapter not found",

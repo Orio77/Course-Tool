@@ -39,7 +39,7 @@ export async function POST(req: Request, res: Response) {
         let result: outputUnits = [];
         let system_prompt = 'Act as a master course creator. Create course content. Create chapter titles. Find most suited youtube videos';
 
-        for (const prompt in user_prompts) {
+        for (const prompt of user_prompts) {
             let output = await strict_output(
                 system_prompt,
                 prompt,

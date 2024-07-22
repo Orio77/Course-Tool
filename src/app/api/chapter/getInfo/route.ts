@@ -2,6 +2,7 @@ import { prisma } from "@/lib/db";
 import { strict_output } from "@/lib/gpt";
 import { getQuestionsFromTranscript, getTranscript, searchYouTube } from "@/lib/youtube";
 import { NextResponse } from "next/server";
+import OpenAI from "openai";
 import { z } from "zod";
 
 const bodyParser = z.object({
@@ -27,7 +28,33 @@ export async function POST(req: Request, res: Response) {
             });
         }
 
-        const videoId = await searchYouTube(chapter.youtubeSearchQuery);
+        let videoId = await searchYouTube(chapter.youtubeSearchQuery);
+
+        if (!videoId) {
+            const openai = new OpenAI();
+            let response = await openai.chat.completions.create({
+                messages: [{
+                    role: "system", content: 'You are a helpful assistant that provides youtube search queries that will result in popular videos, related to the query'
+                }, {
+                    role: 'user', content: `There result videos of the following query had no transcript ${chapter.youtubeSearchQuery}. That's because they were ver little popular. Provide a new query, that will result in videos with transcript. Make the target of the query as it was.`
+                }],
+                model: "gpt-4o-mini",
+            });
+
+            let newQuery = response.choices[0]?.message?.content;
+
+            if (newQuery == null) {
+                return NextResponse.json({
+                    success: false,
+                    error: "Old query was old, new query was null",
+                }, {
+                    status: 500
+                });
+            }
+
+            videoId = await searchYouTube(newQuery);
+
+        }
 
         if (!videoId) {
             console.error("YouTube search failed for query:", chapter.youtubeSearchQuery);

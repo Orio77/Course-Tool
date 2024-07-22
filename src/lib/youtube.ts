@@ -8,16 +8,20 @@ export async function searchYouTube(searchQuery: string) {
     const { data } = await axios.get(
       `https://www.googleapis.com/youtube/v3/search?key=${process.env.YOUTUBE_API}&q=${searchQuery}&videoDuration=medium&videoEmbeddable=true&type=video&maxResults=5`
     );
-    if (!data) {
+    if (!data || !data.items) {
         console.log("youtube fail");
         return null;
     }
 
-    if (data.items[0] == undefined) {
-      console.log("youtube fail");
-      return null;
+    for (let item of data.items) {
+        const transcript = await getTranscript(item.id.videoId);
+        if (transcript) {
+            return item.id.videoId;
+        }
     }
-    return data.items[0].id.videoId;
+
+    console.log("youtube fail - no transcripts available");
+    return null;
 }
 
 export async function getTranscript(videoId: string) {

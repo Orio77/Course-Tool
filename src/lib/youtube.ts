@@ -43,8 +43,11 @@ export async function getQuestionsFromTranscript(transcript: string, course_titl
         option2: string,
         option3: string,
     }
-    const questions: Question[] = await strict_output('Act as a master at creating mcq questions and answers. The answers must be short - no more than 15 words',
-        new Array(5).fill(`You are to generate a random hard mcq question about ${course_title} with context of the following transcript: ${transcript}`),
+    const questions: Question[] = []
+
+    for (let i = 0; i < 5; i++) {
+        let response = await strict_output('Act as a master at creating mcq questions and answers. The answers must be short - no more than 15 words',
+            `You are to generate a random hard mcq question about ${course_title} with context of the following transcript: ${transcript}`,
             {
                 question: 'question',
                 answer: 'answer with max length of 15 words',
@@ -52,6 +55,9 @@ export async function getQuestionsFromTranscript(transcript: string, course_titl
                 option2: 'option with max length of 15 words',
                 option3: 'option with max length of 15 words'
             }
-    )
-    return questions;
+        )
+        questions.push(response)
+    }
+
+    return Array.isArray(questions) ? questions : [questions];
 }

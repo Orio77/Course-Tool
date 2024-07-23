@@ -36,7 +36,7 @@ export async function POST(req: Request, res: Response) {
                 messages: [{
                     role: "system", content: 'You are a helpful assistant that provides youtube search queries that will result in popular videos, related to the query'
                 }, {
-                    role: 'user', content: `There result videos of the following query had no transcript ${chapter.youtubeSearchQuery}. That's because they were ver little popular. Provide a new query, that will result in videos with transcript. Make the target of the query as it was.`
+                    role: 'user', content: `The result videos of the following query had no transcript ${chapter.youtubeSearchQuery}. That's because they were ver little popular. Provide a new query, that will result in videos with transcript. Make the target of the query as it was.`
                 }],
                 model: "gpt-4o-mini",
             });

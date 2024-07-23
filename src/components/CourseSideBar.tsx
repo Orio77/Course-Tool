@@ -12,7 +12,7 @@ type Props = {
     };
     currentChapterId: string;
 };
-
+// TODO make locked chapters not clickable
 const CourseSideBar = async ({course, currentChapterId}: Props) => {
   return (
     <div className='w-[400px] absolute top-1/2 -translate-y-1/2 p-6 rounded-r-3x1 bg-secondary'>

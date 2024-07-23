@@ -65,3 +65,11 @@ export async function getQuestionsFromTranscript(transcript: string, course_titl
 
     return Array.isArray(questions) ? questions : [questions];
 }
+
+
+
+// TODO:
+/* 
+Dodać do ai query by szukał filmików w jezyku takim, jak 'query'
+Zająć się if (!videoId) w getInfo route.ts
+*/

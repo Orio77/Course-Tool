@@ -51,6 +51,7 @@ model User {
 
   accounts Account[]
   sessions Session[]
+  // courses Course[]
 }
 
 model Course {
@@ -81,9 +82,12 @@ model Chapter {
   summary            String?    @db.VarChar(3000)
   unit               Unit       @relation(fields: [unitId], references: [id])
   questions          Question[]
+  // TODO isUnlocked Boolean
 
   @@index([unitId], name: "unitId")
 }
+
+// TODO Chapter should have an Article Id
 
 model Question {
   id        String @id @default(cuid())
@@ -105,3 +109,5 @@ model UserSubscription {
   stripePriceId          String?   @map(name: "stripe_price_id")
   stripeCurrentPeriodEnd DateTime? @map(name: "stripe_current_period_end")
 }
+
+// TODO model Article (with Id, title, content)

@@ -3,12 +3,9 @@ import { getAuthSession } from "@/lib/auth";
 import Image from "next/image";
 import Link from "next/link";
 
-const getSession = async () => {
-  return await getAuthSession();
-}
-
 const Home = async () => {
-  const session = await getSession()
+  const session = await getAuthSession();
+  console.log(session)
   return (
     <div className="w-full min-h-screen flex items-center justify-center px-4 py-8 relative bg-white dark:bg-gray-950">
       <div className="absolute inset-0 z-0">

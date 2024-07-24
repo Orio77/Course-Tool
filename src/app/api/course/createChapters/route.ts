@@ -4,7 +4,6 @@ import { strict_output } from "@/lib/gpt";
 import { checkSubscription } from "@/lib/subscription";
 import { getUnsplashImage } from "@/lib/unsplash";
 import { createChaptersSchema } from "@/validators/course";
-import { Course } from "@prisma/client";
 import { NextResponse } from "next/server";
 import { ZodError } from "zod";
 
@@ -70,8 +69,6 @@ export async function POST(req: Request, res: Response) {
             },
         });
 
-        let first = true;
-
         for (const unit of result) {
             const title = unit.title;
             const prismaUnit = await prisma.unit.create({
@@ -120,7 +117,7 @@ export async function POST(req: Request, res: Response) {
             },
         });
 
-        await unlockNextChapter(course.id);
+        // await unlockNextChapter(course.id);
 
         return NextResponse.json({course_id: course.id});
 

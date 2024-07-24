@@ -7,8 +7,6 @@ import { RadioGroup, RadioGroupItem } from './ui/radio-group';
 import React from 'react';
 import { Button } from './ui/button';
 import { ChevronRight } from 'lucide-react';
-import { unlockNextChapter } from '@/app/api/course/createChapters/route';
-import { prisma } from '@/lib/db';
 
 type Props = {
   chapter: Chapter & {
@@ -21,7 +19,7 @@ const QuizCards = ({chapter, courseId}: Props) => {
   const [answers, setAnswers] = React.useState<Record<string, string>>({});
   const [questionState, setQuestionState] = React.useState<Record<string, boolean | null>>({});
 
-  const checkAnswer = React.useCallback(()=> {
+  const checkAnswer = React.useCallback(async ()=> {
     const newQuestionState = {...questionState}
     chapter.questions.forEach(question => {
       const user_answer = answers[question.id]
@@ -47,8 +45,23 @@ const QuizCards = ({chapter, courseId}: Props) => {
     }
 
     if (allRight) {
-      unlockNextChapter(courseId)
-    }
+      try {
+          const response = await fetch('/api/unlock-next-chapter', {
+              method: 'POST',
+              headers: {
+                  'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({ courseId }),
+          });
+          if (!response.ok) {
+              throw new Error('Failed to unlock the chapter');
+          }
+          // Handle response appropriately
+          console.log('Chapter unlocked!');
+      } catch (error) {
+          console.error('Error unlocking chapter:', error);
+      }
+  }
 
   }, [answers, questionState, chapter.questions, courseId])
 

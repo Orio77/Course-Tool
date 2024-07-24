@@ -49,7 +49,7 @@ const CoursePage = async ({params: {slug}}: Props) => {
                 <div className='ml-[400px] px-8'>
                     <div className='flex'>
                         <MainVideoSummary chapter={chapter} chapterIndex={chapterIndex} unit={unit} unitIndex={unitIndex} />
-                        <QuizCards chapter={chapter}/>
+                        <QuizCards chapter={chapter} courseId={courseId}/>
                         {/* TODO Create a component that will expand with an article, available after the user has answered correctly to all the questions. 
                         Then a button to "I have finished reading", which takes the user to a page with 3 open questions as a test and 20 minutes timer. If the score is more than 40/100, the test is passed*/}
                     </div>
@@ -73,7 +73,7 @@ const CoursePage = async ({params: {slug}}: Props) => {
                             </Link>
                         )}
 
-                        {nextChapter && ( // TODO make next chapter unclickable if it is locked (hide the button)
+                        {nextChapter && nextChapter.isUnlocked && ( 
                             <Link href={`/course/${course.id}/${unitIndex}/${chapterIndex + 1}`} className='flex mt-4 ml-auto w-fit'>
                                 <div className='flex items-center'>
                                     <div className='flex flex-col items-start'>

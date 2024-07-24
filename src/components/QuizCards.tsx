@@ -7,14 +7,17 @@ import { RadioGroup, RadioGroupItem } from './ui/radio-group';
 import React from 'react';
 import { Button } from './ui/button';
 import { ChevronRight } from 'lucide-react';
+import { unlockNextChapter } from '@/app/api/course/createChapters/route';
+import { prisma } from '@/lib/db';
 
 type Props = {
   chapter: Chapter & {
     questions: Question[];
   };
+  courseId: string,
 };
 
-const QuizCards = ({chapter}: Props) => {
+const QuizCards = ({chapter, courseId}: Props) => {
   const [answers, setAnswers] = React.useState<Record<string, string>>({});
   const [questionState, setQuestionState] = React.useState<Record<string, boolean | null>>({});
 
@@ -33,7 +36,21 @@ const QuizCards = ({chapter}: Props) => {
       }
       setQuestionState(newQuestionState)
     })
-  }, [answers, questionState, chapter.questions])
+
+    let allRight = true
+
+    for (const question in newQuestionState) {
+      if ((newQuestionState[question] !== true)) {
+        allRight = false;
+        break;
+      }
+    }
+
+    if (allRight) {
+      unlockNextChapter(courseId)
+    }
+
+  }, [answers, questionState, chapter.questions, courseId])
 
   return (
     <div className='flex-[1] mt-16 ml-8'>

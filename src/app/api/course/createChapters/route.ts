@@ -4,6 +4,7 @@ import { strict_output } from "@/lib/gpt";
 import { checkSubscription } from "@/lib/subscription";
 import { getUnsplashImage } from "@/lib/unsplash";
 import { createChaptersSchema } from "@/validators/course";
+import { Course } from "@prisma/client";
 import { NextResponse } from "next/server";
 import { ZodError } from "zod";
 
@@ -51,15 +52,6 @@ export async function POST(req: Request, res: Response) {
             result.push(output);
         }
 
-        // let output_units: outputUnits = await strict_output(
-        //     'Act as a master course creator. Create course content. Create chapter titles. Find most suited youtube videos',
-        //    user_prompts,
-        // {
-        //     title: 'title of the unit',
-        //     chapters: 'an array of chapters, each chapter should have a youtube_search_query and a chapter_title key in the JSON object' 
-        // }
-        // );
-
         const imageSearchTerm = await strict_output(
             'Act as a image search master',
             `Provide a perfect image search term for the title of a course about ${title}. Make it short and concise.`,
@@ -77,6 +69,8 @@ export async function POST(req: Request, res: Response) {
                 userId: session.user.id
             },
         });
+
+        let first = true;
 
         for (const unit of result) {
             const title = unit.title;
@@ -97,6 +91,24 @@ export async function POST(req: Request, res: Response) {
                 })
             })
         }
+
+        for (const unit of result) {
+            // Fetch the unit by name to get its id
+            const existingUnit = await prisma.unit.findFirst({
+                where: { name: unit.title },
+                select: { id: true }
+            });
+        
+            if (existingUnit) {
+                // Use the id to update the unit
+                await prisma.unit.update({
+                    where: { id: existingUnit.id },
+                    data: { isUnlocked: true }
+                });
+            }
+            break;
+        }
+
         await prisma.user.update({
             where: {
                 id: session.user.id,
@@ -108,6 +120,8 @@ export async function POST(req: Request, res: Response) {
             },
         });
 
+        await unlockNextChapter(course.id);
+
         return NextResponse.json({course_id: course.id});
 
     } catch (error) {
@@ -116,5 +130,51 @@ export async function POST(req: Request, res: Response) {
         }
         console.error(error);
         return new NextResponse('Internal server error', { status: 500 });
+    }
+}
+
+export async function unlockNextChapter(courseId: string) {
+    const course = await prisma.course.findUnique({
+        where: { id: courseId },
+        include: { units: { include: { chapters: true } } },
+    });
+
+    if (!course) {
+        throw new Error('Course not found');
+    }
+
+    let found = false;
+    let unlockNextUnit = false;
+
+    for (const unit of course.units) {
+        if (unlockNextUnit) {
+            await prisma.unit.update({
+                where: {id: unit.id},
+                data: {isUnlocked: true}
+            })
+
+            for (const chapter of unit.chapters) {
+                await prisma.chapter.update({
+                    where: { id: chapter.id },
+                    data: { isUnlocked: true },
+                });
+                return;
+            }
+        }
+        for (const chapter of unit.chapters) {
+            if (!chapter.isUnlocked) {
+                await prisma.chapter.update({
+                    where: { id: chapter.id },
+                    data: { isUnlocked: true },
+                });
+                found = true;
+            }
+        }
+        if (found) {
+            unlockNextUnit = unit.chapters.every(chapter => chapter.isUnlocked);
+            if (!unlockNextUnit) {
+                return;
+            }
+        }
     }
 }

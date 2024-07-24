@@ -21,8 +21,7 @@ const CourseSideBar = async ({course, currentChapterId}: Props) => {
         </h1>
 
         {course.units.map((unit, unitIndex) => {
-            return (
-            <div key={unit.id} className='mt-4'>
+            return unit.isUnlocked ? (<div key={unit.id} className='mt-4'>
                 <h2 className='text-sm uppercase text-secondary-foreground'>
                     Unit {unitIndex + 1}
                 </h2>
@@ -31,8 +30,8 @@ const CourseSideBar = async ({course, currentChapterId}: Props) => {
                     {unit.name}
                 </h2>
 
-                {unit.chapters.map((chapter, chapterIndex)=> {
-                    return(
+                {unit.chapters.map((chapter, chapterIndex) => {
+                    return chapter.isUnlocked ? (
                         <div key={chapter.id}>
                             <Link href={`/course/${course.id}/${unitIndex}/${chapterIndex}`} className={cn('text-secondary-foreground/60', {
                                 'text-green-500 font-bold': chapter.id === currentChapterId
@@ -40,11 +39,26 @@ const CourseSideBar = async ({course, currentChapterId}: Props) => {
                                 {chapter.name}
                             </Link>
                         </div>
+                    ) : (
+                        <div key={chapter.id} className={cn('text-secondary-foreground/60', {
+                            'text-gray-600 font-bold': chapter.id === currentChapterId
+                        })}>
+                            {chapter.name}
+                        </div>
                     );
                 })}
                 <Separator className='mt-2 text-gray-500 bg-gray-500'/>
-            </div>
-            );
+            </div>) : (
+                <div>
+                    <h2 className='text-sm uppercase text-secondary-foreground'>
+                    Unit {unitIndex + 1}
+                </h2>
+
+                <h2 className='text-2xl font-bold text-gray-600'>
+                    {unit.name}
+                </h2>
+                </div>
+            )
         })}
     </div>
   )

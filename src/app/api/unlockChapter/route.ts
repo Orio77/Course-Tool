@@ -3,7 +3,7 @@ import { unlockNextChapter } from '../course/createChapters/route';
 
 const router = express.Router();
 
-router.post('/unlock-next-chapter', async (req: Request, res: Response) => {
+router.post('/unlockChapter', async (req: Request, res: Response) => {
     try {
         const { courseId } = req.body;
         await unlockNextChapter(courseId);

@@ -72,11 +72,9 @@ const ChapterCard = React.forwardRef<ChapterCardHandler, Props>(({chapter, chapt
                 },
                 onError: (error) => {
                     setSuccess(false)
-                    const errorMessage = error instanceof Error ? error.message : "An unknown error occurred while loading your chapter.";
-                    console.log(errorMessage)
                     toast({
                         title: "Error",
-                        description: errorMessage,
+                        description: "An unknown error occurred while loading your chapter",
                         variant: "destructive",
                     });
                     addChapterIdToSet();

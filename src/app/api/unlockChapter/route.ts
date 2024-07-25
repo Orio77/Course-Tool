@@ -39,6 +39,7 @@ export async function POST(req: Request, res: Response) {
                             where: { id: chapter.id },
                             data: { isUnlocked: true },
                         });
+                        chapter.isUnlocked = true;
                         found = true;
                         break;
                     }

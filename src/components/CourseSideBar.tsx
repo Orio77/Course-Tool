@@ -31,10 +31,12 @@ const CourseSideBar = async ({course, currentChapterId}: Props) => {
                 </h2>
 
                 {unit.chapters.map((chapter, chapterIndex) => {
+                    const isLastUnlocked = chapterIndex === unit.chapters.findIndex(ch => !ch.isUnlocked) - 1;
                     return chapter.isUnlocked ? (
                         <div key={chapter.id}>
                             <Link href={`/course/${course.id}/${unitIndex}/${chapterIndex}`} className={cn('text-secondary-foreground/60', {
-                                'text-green-500 font-bold': chapter.id === currentChapterId
+                                'text-green-500 font-bold': !isLastUnlocked,
+                                'text-orange-400 font-bold': isLastUnlocked
                             })}>
                                 {chapter.name}
                             </Link>

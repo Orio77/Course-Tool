@@ -15,7 +15,6 @@ export async function POST(req: Request, res: Response) {
                 throw new Error('Course not found');
             }
 
-            let found = false;
             let unlockNextUnit = false;
 
             for (const unit of course.units) {
@@ -39,16 +38,12 @@ export async function POST(req: Request, res: Response) {
                             where: { id: chapter.id },
                             data: { isUnlocked: true },
                         });
-                        chapter.isUnlocked = true;
-                        found = true;
                         break;
                     }
                 }
-                if (found) {
-                    unlockNextUnit = unit.chapters.every(chapter => chapter.isUnlocked);
-                    if (!unlockNextUnit) {
-                        return NextResponse.json({ message: 'Chapter unlocked successfully.' }, { status: 200 });
-                    }
+                unlockNextUnit = unit.chapters.every(chapter => chapter.isUnlocked);
+                if (!unlockNextUnit) {
+                    return NextResponse.json({ message: 'Chapter unlocked successfully.' }, { status: 200 });
                 }
         }
         return NextResponse.json({ message: 'No chapters to unlock or already unlocked.' }, { status: 200 });

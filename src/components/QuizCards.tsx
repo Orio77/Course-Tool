@@ -7,6 +7,7 @@ import { RadioGroup, RadioGroupItem } from './ui/radio-group';
 import React from 'react';
 import { Button } from './ui/button';
 import { ChevronRight } from 'lucide-react';
+import { unlockNextChapter } from '@/app/api/course/createChapters/route';
 import axios from 'axios';
 
 type Props = {
@@ -46,19 +47,17 @@ const QuizCards = ({chapter, courseId}: Props) => {
     }
     
     if (allRight) {
-        try {
-            const response = await axios.post('/api/unlockChapter', {
-                courseId
-            }, {
-                headers: {
-                    'Content-Type': 'application/json',
-                }
-            });
-            // Handle response appropriately
-            console.log('Chapter unlocked!', response.data);
-        } catch (error) {
-            console.error('Error unlocking chapter:', error);
+      try {
+        const response = await axios.post('/api/unlockChapter', { courseId });
+    
+        if (response.status !== 200) {
+          throw new Error('Failed to unlock the next chapter');
         }
+    
+        console.log('Next chapter unlocked successfully');
+      } catch (error) {
+        console.error('Error unlocking next chapter:', error);
+      }
     }
 
   }, [answers, questionState, chapter.questions, courseId])

@@ -15,24 +15,18 @@ export async function POST(req: Request) {
             body, signature,
             process.env.STRIPE_WEBHOOK_SECRET as string
         )
-        console.log("First rty catch")
     } catch (error: any) {
-        console.log("Error occurred")
         return new NextResponse('webhook error', {status: 400})
     }
 
     const session = event.data.object as Stripe.Checkout.Session
-    console.log("Session created: ")
-    console.log(session)
 
     if (event.type === 'checkout.session.completed') {
-        console.log("Checkout session completed")
         const subscription = await stripe.subscriptions.retrieve(session.subscription as string)
         if (!session?.metadata?.userId) {
             console.log("No user id")
             return new NextResponse('webhook error, no userId', {status:400})
         }
-        console.log("Continuing")
         await prisma.userSubscription.create({
             data: {
                 userId: session.metadata.userId,
@@ -44,13 +38,9 @@ export async function POST(req: Request) {
                 )
             }
         })
-        console.log("User subscription created")
     }
-    console.log("Between if's")
     if (event.type === 'invoice.payment_succeeded') {
-        console.log("Entered second if")
         const subscription = await stripe.subscriptions.retrieve(session.subscription as string)
-        console.log("Subscription created")
         await prisma.userSubscription.update({
             where: {
                 stripeSubscriptionId: subscription.id
@@ -63,7 +53,6 @@ export async function POST(req: Request) {
             }
         })
     }
-    console.log("returning")
     return new NextResponse(null, {status: 200})
 }
 

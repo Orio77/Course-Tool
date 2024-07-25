@@ -117,7 +117,7 @@ export async function POST(req: Request, res: Response) {
             },
         });
 
-        // await unlockNextChapter(course.id);
+        await unlockNextChapter(course.id);
 
         return NextResponse.json({course_id: course.id});
 

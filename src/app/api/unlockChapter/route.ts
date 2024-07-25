@@ -30,7 +30,7 @@ export async function POST(req: Request, res: Response) {
                             where: { id: chapter.id },
                             data: { isUnlocked: true },
                         });
-                        return;
+                        return NextResponse.json({ message: 'Chapter unlocked successfully.' }, { status: 200 });
                     }
                 }
                 for (const chapter of unit.chapters) {
@@ -40,23 +40,24 @@ export async function POST(req: Request, res: Response) {
                             data: { isUnlocked: true },
                         });
                         found = true;
+                        break;
                     }
                 }
                 if (found) {
                     unlockNextUnit = unit.chapters.every(chapter => chapter.isUnlocked);
                     if (!unlockNextUnit) {
-                        return;
+                        return NextResponse.json({ message: 'Chapter unlocked successfully.' }, { status: 200 });
                     }
                 }
         }
-        return new NextResponse(null, {status: 200})
+        return NextResponse.json({ message: 'No chapters to unlock or already unlocked.' }, { status: 200 });
     } catch (error: unknown) {
       if (error instanceof Error) {
-        console.log(500, error.message)
-        return new NextResponse(null, {status: 500})
+        console.error('Error:', error.message);
+        return NextResponse.json({ error: error.message }, { status: 500 });
       } else {
-        console.log('An unknown error occurred', 500)
-        return new NextResponse(null, {status: 500})
+        console.error('An unknown error occurred');
+            return NextResponse.json({ error: 'An unknown error occurred' }, { status: 500 });
       }
     }
 }
